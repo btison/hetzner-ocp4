@@ -1,0 +1,43 @@
+---
+
+- name: Find entitlement
+  find:
+    paths: /etc/pki/entitlement/
+    patterns: '*-key.pem'
+  register: files
+
+- name: "Check entitlement"
+  fail:
+    msg: "To many entitlements"
+  when: files.matched > 1
+
+# /etc/pki/entitlement/4988695409571740307-key.pem
+# - debug:
+#     msg: "{{ files.files[0].path | regex_replace('^/etc/pki/entitlement/([0-9]+)-key.pem$', '\\1') }}"
+
+- set_fact:
+    entitlement_id: "{{ files.files[0].path | regex_replace('^/etc/pki/entitlement/([0-9]+)-key.pem$', '\\1') }}"
+
+- shell: "cat /etc/pki/entitlement/{{ entitlement_id }}-key.pem | base64 -w0"
+  register: register_entitlement_key_base64
+
+- shell: "cat /etc/pki/entitlement/{{ entitlement_id }}.pem | base64 -w0"
+  register: register_entitlement_base64
+
+- name: Apply entitle machineconfig
+  k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: "{{ lookup('template', 'templates/0003-cluster-wide-machineconfigs.yaml.j2') }}"
+  vars:
+    entitlement_key_base64: "{{ register_entitlement_key_base64.stdout }}"
+    entitlement_base64: "{{ register_entitlement_base64.stdout }}"
+
+# - debug:
+#     msg: "entitlement_base64 : {{ entitlement_base64 }}"
+
+# - debug:
+#     var: output
+#     # msg: "{{ lookup('file','/etc/pki/entitlement/' + entitlement_id + '-key.pem')  }}"
+# # b64decode
+
