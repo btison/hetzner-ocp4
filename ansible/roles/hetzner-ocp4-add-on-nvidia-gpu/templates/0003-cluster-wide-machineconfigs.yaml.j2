@@ -2,8 +2,9 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   labels:
-    machineconfiguration.openshift.io/role: worker
-  name: 50-rhsm-conf
+  labels:
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-rhsm-conf
 spec:
   config:
     ignition:
@@ -20,8 +21,8 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   labels:
-    machineconfiguration.openshift.io/role: worker
-  name: 50-entitlement-pem
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-entitlement-pem
 spec:
   config:
     ignition:
@@ -38,8 +39,8 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   labels:
-    machineconfiguration.openshift.io/role: worker
-  name: 50-entitlement-key-pem
+    machineconfiguration.openshift.io/role: {{ role }}
+  name: 50-{{ role }}-entitlement-key-pem
 spec:
   config:
     ignition:
