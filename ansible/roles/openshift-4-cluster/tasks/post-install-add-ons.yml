@@ -7,7 +7,7 @@
 - name: "Handle post_install_add_ons (include_role)"
   include_role:
     name: "hetzner-ocp4-add-on-{{ item.name }}"
-    tasks_from: "{{ item.tasks_from }}"
+    tasks_from: "{{ item.tasks_from | default('main.yml') }}"
   with_items: "{{ post_install_add_ons | default ([]) }}"
 
 # - name: "Handle post_install_add_ons (include)"
